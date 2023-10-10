@@ -2,9 +2,11 @@
 #include <rclcpp/qos.hpp>
 #include <drobo_interfaces/msg/md_lib_msg.hpp>
 #include <drobo_interfaces/msg/sd_lib_msg.hpp>
+#include <usb_connect/usb_connect.hpp>
 #include <motor_lib/motor_lib.hpp>
 
 #include "dmotor_ros/main.hpp"
+uint8_t buf[MotorLib::TX_SIZE] = {0};
 
 DMotorRos::DMotorRos(
     const rclcpp::NodeOptions& options
@@ -20,11 +22,20 @@ DMotorRos::DMotorRos(
         [this](const drobo_interfaces::msg::MdLibMsg::SharedPtr msg){
             switch(msg->mode){
                 case MotorLib::Md::PWM:
-                    RCLCPP_INFO(this->get_logger(), "%d,%d\n", msg->address, msg->power);
-                    MotorLib::md.sendPwm(msg->address, msg->phase, msg->power, 5000);
+                    if(!msg->use_semi) MotorLib::md.sendPwm(msg->address, msg->phase, msg->power, 5000);
+                    else MotorLib::md.sendPwm(msg->address, msg->semi_id, msg->phase, msg->power, 5000);
                     break;
                 case MotorLib::Md::SPEED:
-                    MotorLib::md.sendSpeed(msg->address, msg->phase, msg->power, 0, 1000, 5000);
+                    if(!msg->use_semi) MotorLib::md.sendSpeed(msg->address, msg->phase, msg->power, msg->angle, msg->timeout, 5000);
+                    else MotorLib::md.sendSpeed(msg->address, msg->semi_id, msg->phase, msg->power, msg->angle, msg->timeout, 5000);
+                    break;
+                case MotorLib::Md::ANGLE:
+                    if(!msg->use_semi) MotorLib::md.sendAngle(msg->address, msg->power, msg->angle, msg->timeout, 5000);
+                    else MotorLib::md.sendAngle(msg->address, msg->semi_id, msg->power, msg->angle, msg->timeout, 5000);
+                    break;
+                case MotorLib::Md::LIM_SW:
+                    if(!msg->use_semi) MotorLib::md.sendLimSw(msg->address, msg->phase, msg->power, (MotorLib::Md::LimPort)msg->port, msg->timeout, 5000);
+                    else MotorLib::md.sendLimSw(msg->address, msg->semi_id, msg->phase, msg->power, (MotorLib::Md::LimPort)msg->port, msg->timeout, 5000);
                     break;
             }
         }
