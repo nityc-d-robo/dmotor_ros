@@ -78,6 +78,9 @@ int main(int argc, char* argv[]){
     for(int i = 0x00; i <= 0x01; i++){
         MotorLib::sd.sendPowers(i, 0, 0, 5000);
     }
+    
+    MotorLib::sr.sendColors(0, 255, 0, 0, 5000);
+    MotorLib::sr.sendStop();
 
     rclcpp::init(argc, argv);
     rclcpp::spin(std::make_shared<DMotorRos>());
