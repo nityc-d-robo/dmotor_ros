@@ -8,6 +8,7 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(drobo_interfaces REQUIRED)
 find_package(usb_connect REQUIRED)
 find_package(motor_lib REQUIRED)
@@ -31,6 +32,7 @@ target_link_libraries(dmotor_ros
 
 ament_target_dependencies(dmotor_ros
   rclcpp
+  std_msgs
   drobo_interfaces
 )
 

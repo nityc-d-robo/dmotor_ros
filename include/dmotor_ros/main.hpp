@@ -1,4 +1,5 @@
 #include <rclcpp/rclcpp.hpp>
+#include <std_msgs/msg/bool.hpp>
 #include <drobo_interfaces/msg/md_lib_msg.hpp>
 #include <drobo_interfaces/msg/sd_lib_msg.hpp>
 
