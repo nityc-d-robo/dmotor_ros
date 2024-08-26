@@ -49,6 +49,21 @@ DMotorRos::DMotorRos(
             MotorLib::sd.sendPower(msg->address, port, msg->power1, 5000);
         }
     );
+
+    _subscription_sr = this->create_subscription<std_msgs::msg::Bool>(
+        "sr_driver_topic",
+        rclcpp::QoS(10),
+        [this](const std_msgs::msg::Bool::SharedPtr msg){
+                
+            if (msg->data){
+                MotorLib::sr.sendStop();
+            }
+            else{
+                MotorLib::sr.sendStart(1000);
+            }
+
+        }
+    );
 }
 
 int main(int argc, char* argv[]){
@@ -63,6 +78,9 @@ int main(int argc, char* argv[]){
     for(int i = 0x00; i <= 0x01; i++){
         MotorLib::sd.sendPowers(i, 0, 0, 5000);
     }
+    
+    MotorLib::sr.sendColors(0, 255, 0, 0, 5000);
+    MotorLib::sr.sendStop();
 
     rclcpp::init(argc, argv);
     rclcpp::spin(std::make_shared<DMotorRos>());
