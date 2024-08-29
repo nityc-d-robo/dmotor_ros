@@ -1,5 +1,5 @@
 use safe_drive:: {
-    context::Context, error::DynError, logger::Logger, pr_info, topic::subscriber::Subscriber,
+    context::Context, error::DynError, logger::Logger, pr_error, topic::subscriber::Subscriber,
 };
 use drobo_interfaces::msg::{MdLibMsg, SdLibMsg, BlMdLibMsg};
 use rusb::{DeviceHandle, GlobalContext};
@@ -24,22 +24,38 @@ async fn main() -> Result<(), DynError> {
 }
 
 async fn md_receiver(mut subscriber: Subscriber<MdLibMsg>, handle_: &DeviceHandle<GlobalContext>) -> Result<(), DynError> {
+    let logger = Logger::new("md_receiver");
     loop{
         let msg = subscriber.recv().await?;
-        let status = match msg.mode{
-            motor_lib::md::Mode::PWM => motor_lib::md::send_pwm(handle_, msg.address,  if msg.phase {msg.power as i16} else {-1 * msg.power as i16}),
-            motor_lib::md::Mode::SPEED => motor_lib::md::send_speed(handle_, msg.address, msg.power as i16),
-            motor_lib::md::Mode::ANGLE => motor_lib::md::send_angle(handle_, msg.address, msg.angle as i16),
-            _ => motor_lib::md::receive_status(handle_, msg.address)
+        let status = loop {
+            match match msg.mode {
+                motor_lib::md::Mode::PWM => motor_lib::md::send_pwm(handle_, msg.address,  if msg.phase {msg.power as i16} else {-1 * msg.power as i16}),
+                motor_lib::md::Mode::SPEED => motor_lib::md::send_speed(handle_, msg.address, msg.power as i16),
+                motor_lib::md::Mode::ANGLE => motor_lib::md::send_angle(handle_, msg.address, msg.angle as i16),
+                _ => motor_lib::md::receive_status(handle_, msg.address)
+            } {
+                Ok(t) => break t,
+                Err(e) => {
+                    pr_error!(logger, "{:?}", e);
+                }
+            }
         };
     }
 }
 async fn blmd_receiver(mut subscriber: Subscriber<BlMdLibMsg>, handle_: &DeviceHandle<GlobalContext>) -> Result<(), DynError> {
+    let logger = Logger::new("blmd_receiver");
     loop{
         let msg = subscriber.recv().await?;
-        let status = match msg.mode{
+        let status = loop {
+            match match msg.mode{
             motor_lib::blmd::Mode::CURRENT => motor_lib::blmd::send_current(handle_, msg.controller_id,  msg.current),
             _ => motor_lib::blmd::receive_status(handle_, msg.controller_id)
+            } {
+                Ok(t) => break t,
+                Err(e) => {
+                    pr_error!(logger, "{:?}", e);
+                }
+            };
         };
     }
 }
