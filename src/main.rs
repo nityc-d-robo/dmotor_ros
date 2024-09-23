@@ -40,7 +40,7 @@ async fn md_receiver(mut subscriber: Subscriber<MdLibMsg>, handle_: &DeviceHandl
 async fn sd_receiver(mut subscriber: Subscriber<SdLibMsg>, handle_: &DeviceHandle<GlobalContext>) -> Result<(), DynError> {
     loop{
         let msg = subscriber.recv().await?;
-        let _ = motor_lib::sd::send_power(handle_, msg.address, 0, msg.power1 as i16);
+        let _ = motor_lib::sd::send_power(handle_, msg.address, msg.port, msg.power1 as i16);
     }
 }
 async fn blmd_receiver(mut subscriber: Subscriber<BlMdLibMsg>, handle_: &DeviceHandle<GlobalContext>) -> Result<(), DynError> {
