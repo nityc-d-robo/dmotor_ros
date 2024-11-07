@@ -1,0 +1,18 @@
+[package]
+name = "dmotor_ros"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-std = { version = "1", features = ["attributes"] }
+safe_drive = "0.4"
+drobo_interfaces = { path = "/tmp/2024_robot1_workspace/drobo_interfaces" }
+rusb = "0.9"
+motor_lib = { git = "https://github.com/nityc-d-robo/motor_lib.git", branch = "feature/rs-error-handling" }
+
+[package.metadata.ros]
+msg = ["drobo_interfaces"]
+
+#please change omni_control_sample to your work space name 
+msg_dir = "/tmp/2024_robot1_workspace/"
+safe_drive_version = "0.4"
