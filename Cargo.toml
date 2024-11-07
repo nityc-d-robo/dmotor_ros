@@ -8,7 +8,7 @@ async-std = { version = "1", features = ["attributes"] }
 safe_drive = "0.4"
 drobo_interfaces = { path = "/tmp/2024_robot1_workspace/drobo_interfaces" }
 rusb = "0.9"
-motor_lib = { git = "https://github.com/nityc-d-robo/motor_lib.git", branch = "feature/rs-error-handling" }
+motor_lib = { git = "https://github.com/nityc-d-robo/motor_lib.git", branch = "master" }
 
 [package.metadata.ros]
 msg = ["drobo_interfaces"]
