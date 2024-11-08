@@ -32,7 +32,7 @@ async fn md_receiver(mut subscriber: Subscriber<MdLibMsg>, handle_: &DeviceHandl
         let status = loop {
             match match msg.mode {
                 motor_lib::md::Mode::PWM => motor_lib::md::send_pwm(handle_, msg.address,  if msg.phase {msg.power as i16} else {-1 * msg.power as i16}),
-                motor_lib::md::Mode::SPEED => motor_lib::md::send_speed(handle_, msg.address, msg.power as i16),
+                motor_lib::md::Mode::SPEED => motor_lib::md::send_speed(handle_, msg.address, if msg.phase {msg.power as i16} else {-msg.power as i16}),
                 motor_lib::md::Mode::ANGLE => motor_lib::md::send_angle(handle_, msg.address, msg.angle as i16),
                 _ => motor_lib::md::receive_status(handle_, msg.address)
             } {  
